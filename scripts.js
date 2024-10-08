@@ -1,97 +1,64 @@
-const scriptUrl = 'https://script.google.com/macros/s/AKfycbwOgmUXEHAq8Qm2wMVlbj4hGoVIe6rd0GhXVIgwYHHCK0YxEZfTJkX_0-dn4-s8nDM/exec'; // Replace with your deployed Apps Script URL
+const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZY0TyDqRoekAHYFJwdCTclPhIHHO7Mi5S130fvxgjPKeX_ID1eZuPsk60Yus0IE8/exec';
 
-// Fetch the list of books
+// Handle Book List Display
 async function fetchBooks() {
-    try {
-        const response = await fetch(scriptUrl);
-        const books = await response.json();
-        displayBooks(books);
-    } catch (error) {
-        console.error('Error fetching books:', error);
-    }
-}
-
-// Display books in the HTML
-function displayBooks(books) {
+    const response = await fetch(scriptUrl + '?action=getBooks');
+    const books = await response.json();
     const bookList = document.getElementById('book-list');
-    let html = '<ul>';
-    books.forEach((book) => {
-        html += `<li><strong>${book.title}</strong> by ${book.author} (Available: ${book.available})</li>`;
+    bookList.innerHTML = '';
+
+    books.forEach(book => {
+        const bookItem = document.createElement('div');
+        bookItem.className = 'book-item';
+        bookItem.innerHTML = `<h3>${book.title}</h3>
+                              <p>Author: ${book.author}</p>
+                              <p>Genre: ${book.genre}</p>
+                              <p>Available: ${book.available}</p>
+                              <button class="add-to-cart" data-isbn="${book.isbn}">Add to Cart</button>`;
+        bookList.appendChild(bookItem);
     });
-    html += '</ul>';
-    bookList.innerHTML = html;
+
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+        button.addEventListener('click', addToCart);
+    });
 }
 
-// Handle book checkout
-async function handleCheckout(event) {
-    event.preventDefault();
+// Handle adding to Cart
+function addToCart(event) {
+    const isbn = event.target.getAttribute('data-isbn');
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
     
-    const bookTitle = document.getElementById('book-title').value;
-    const userName = document.getElementById('user-name').value;
+    cart.push(isbn);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert('Book added to cart!');
+}
 
+// Handle Checkout
+document.getElementById('checkout-btn').addEventListener('click', async function() {
+    const cart = JSON.parse(localStorage.getItem('cart'));
+    if (!cart || cart.length === 0) {
+        alert('Your cart is empty.');
+        return;
+    }
+
+    const username = prompt('Enter your username for checkout:');
     const payload = {
         action: 'checkout',
-        bookTitle: bookTitle,
-        userName: userName
+        cart: cart,
+        username: username
     };
 
-    try {
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-        const result = await response.text();
-        document.getElementById('checkout-result').innerText = result;
-        fetchBooks(); // Refresh the list of books after checkout
-    } catch (error) {
-        console.error('Error during checkout:', error);
-        document.getElementById('checkout-result').innerText = 'Checkout failed. Try again.';
-    }
+    const response = await fetch(scriptUrl, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+    const result = await response.text();
+    alert(result);
+    localStorage.removeItem('cart');
+});
 
-    document.getElementById('checkout-form').reset();
-}
-
-// Handle admin login
-async function handleAdminLogin(event) {
-    event.preventDefault();
-
-    const username = document.getElementById('admin-username').value;
-    const password = document.getElementById('admin-password').value;
-
-    const payload = {
-        action: 'login',
-        username: username,
-        password: password
-    };
-
-    try {
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-        const result = await response.text();
-        if (result === 'Success') {
-            document.getElementById('admin-login-result').innerText = 'Login successful!';
-            document.getElementById('admin-add-book-section').style.display = 'block';
-        } else {
-            document.getElementById('admin-login-result').innerText = 'Invalid credentials.';
-        }
-    } catch (error) {
-        console.error('Error during login:', error);
-        document.getElementById('admin-login-result').innerText = 'Login failed. Try again.';
-    }
-
-    document.getElementById('admin-login-form').reset();
-}
-
-// Handle adding a new book
-async function handleAddBook(event) {
+// Handle Admin: Add Book
+document.getElementById('add-book-form').addEventListener('submit', async function(event) {
     event.preventDefault();
 
     const title = document.getElementById('title').value;
@@ -109,29 +76,12 @@ async function handleAddBook(event) {
         quantity: quantity
     };
 
-    try {
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-        const result = await response.text();
-        document.getElementById('add-book-result').innerText = result;
-        fetchBooks(); // Refresh the list of books after adding
-    } catch (error) {
-        console.error('Error adding book:', error);
-        document.getElementById('add-book-result').innerText = 'Failed to add book. Try again.';
-    }
-
-    document.getElementById('add-book-form').reset();
-}
-
-// Initialize the app by fetching books on page load
-fetchBooks();
-
-// Attach event listeners
-document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
-document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
-document.getElementById('add-book-form').addEventListener('submit', handleAddBook);
+    const response = await fetch(scriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+    const result = await response.text();
+    document.getElementById('add-book-result').innerText = result;
+    fetchBooks();
+});

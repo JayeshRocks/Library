@@ -3,53 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library Inventory Manager</title>
+    <title>Online Library</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
     <header>
-        <h1>Library Inventory Manager</h1>
+        <h1>Welcome to the Online Library</h1>
+        <nav>
+            <ul id="nav-links">
+                <li><a href="#">Books</a></li>
+                <li><a href="#" id="nav-reservations">Reservations</a></li>
+                <li><a href="#" id="nav-cart">Cart</a></li>
+                <li id="nav-checkouts" style="display:none;"><a href="#">Checkouts</a></li>
+                <li id="nav-add-remove" style="display:none;"><a href="#">Add/Remove Books</a></li>
+            </ul>
+        </nav>
+        <div id="user-controls">
+            <button id="login-btn">Login</button>
+            <button id="signup-btn">Sign Up</button>
+            <button id="logout-btn" style="display:none;">Logout</button>
+        </div>
     </header>
-
-    <main>
-        <section id="book-list-section">
+    
+    <main id="content">
+        <!-- Home Content: Books will be listed here -->
+        <section id="book-section">
             <h2>Available Books</h2>
-            <div id="book-list">
-                <!-- Book list will be populated here -->
-            </div>
+            <div id="book-list"></div>
         </section>
 
-        <section id="check-out-form">
-            <h2>Check Out a Book</h2>
-            <form id="checkout-form">
-                <label for="book-title">Book Title:</label>
-                <input type="text" id="book-title" required>
-                
-                <label for="user-name">Your Name:</label>
-                <input type="text" id="user-name" required>
-                
-                <button type="submit">Check Out</button>
-            </form>
-            <div id="checkout-result"></div>
+        <!-- Reservation Code -->
+        <section id="reservation-section" style="display:none;">
+            <h2>Your Reservation Code</h2>
+            <button id="generate-reservation-code">Get Reservation Code</button>
+            <p id="reservation-code-result"></p>
         </section>
 
-        <!-- Admin Login Section -->
-        <section id="admin-login-section">
-            <h2>Admin Login</h2>
-            <form id="admin-login-form">
-                <label for="admin-username">Username:</label>
-                <input type="text" id="admin-username" required>
-                
-                <label for="admin-password">Password:</label>
-                <input type="password" id="admin-password" required>
-                
-                <button type="submit">Login</button>
-            </form>
-            <div id="admin-login-result"></div>
+        <!-- Cart -->
+        <section id="cart-section" style="display:none;">
+            <h2>Your Cart</h2>
+            <div id="cart-items"></div>
+            <button id="checkout-btn">Checkout</button>
         </section>
 
-        <!-- Admin Section for Adding Books -->
-        <section id="admin-add-book-section" style="display: none;">
+        <!-- Admin: Checkouts -->
+        <section id="checkout-section" style="display:none;">
+            <h2>Checkouts Overview</h2>
+            <div id="checkout-list"></div>
+        </section>
+
+        <!-- Admin: Add/Remove Books -->
+        <section id="add-remove-section" style="display:none;">
             <h2>Add a New Book</h2>
             <form id="add-book-form">
                 <label for="title">Title:</label>
@@ -57,26 +62,73 @@
                 
                 <label for="author">Author:</label>
                 <input type="text" id="author" required>
-                
+
                 <label for="isbn">ISBN:</label>
                 <input type="text" id="isbn" required>
-                
+
                 <label for="genre">Genre:</label>
                 <input type="text" id="genre" required>
-                
+
                 <label for="quantity">Quantity Available:</label>
                 <input type="number" id="quantity" required>
-                
+
                 <button type="submit">Add Book</button>
+                <p id="add-book-result"></p>
             </form>
-            <div id="add-book-result"></div>
         </section>
     </main>
 
-    <footer>
-        <p>© 2024 Library Inventory</p>
-    </footer>
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-login">&times;</span>
+            <h2>Login</h2>
+            <form id="login-form">
+                <label for="login-username">Username or Email:</label>
+                <input type="text" id="login-username" required>
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" required>
+                <button type="submit">Login</button>
+                <p id="login-result"></p>
+            </form>
+        </div>
+    </div>
 
-    <script src="script.js"></script>
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-signup">&times;</span>
+            <h2>Sign Up</h2>
+            <form id="signup-form">
+                <label for="signup-name">Name:</label>
+                <input type="text" id="signup-name" required>
+                
+                <label for="signup-dob">D.O.B.:</label>
+                <input type="date" id="signup-dob" required>
+                
+                <label for="signup-type">Type:</label>
+                <select id="signup-type" required>
+                    <option value="Student">Student</option>
+                    <option value="Teacher">Teacher</option>
+                </select>
+
+                <label for="signup-username">Username:</label>
+                <input type="text" id="signup-username" required>
+
+                <label for="signup-email">Email:</label>
+                <input type="email" id="signup-email" required>
+
+                <label for="signup-password">Password:</label>
+                <input type="password" id="signup-password" required>
+
+                <button type="submit">Sign Up</button>
+                <p id="signup-result"></p>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Online Library. All Rights Reserved.</p>
+    </footer>
 </body>
 </html>
