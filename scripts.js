@@ -1,4 +1,4 @@
-const scriptUrl = 'your_google_apps_script_url_here'; // Replace with your deployed Apps Script URL
+const scriptUrl = 'https://script.google.com/macros/s/AKfycby2JQciZNhv2V02BfL4VHVnIVeZK5yZuTbqdkxQcS6blfQoUaDADZZeob4FZp47zA/exec'; // Replace with your deployed Apps Script URL
 
 // Fetch the list of books
 async function fetchBooks() {
@@ -30,6 +30,7 @@ async function handleCheckout(event) {
     const userName = document.getElementById('user-name').value;
 
     const payload = {
+        action: 'checkout',
         bookTitle: bookTitle,
         userName: userName
     };
@@ -53,8 +54,84 @@ async function handleCheckout(event) {
     document.getElementById('checkout-form').reset();
 }
 
+// Handle admin login
+async function handleAdminLogin(event) {
+    event.preventDefault();
+
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+
+    const payload = {
+        action: 'login',
+        username: username,
+        password: password
+    };
+
+    try {
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        const result = await response.text();
+        if (result === 'Success') {
+            document.getElementById('admin-login-result').innerText = 'Login successful!';
+            document.getElementById('admin-add-book-section').style.display = 'block';
+        } else {
+            document.getElementById('admin-login-result').innerText = 'Invalid credentials.';
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        document.getElementById('admin-login-result').innerText = 'Login failed. Try again.';
+    }
+
+    document.getElementById('admin-login-form').reset();
+}
+
+// Handle adding a new book
+async function handleAddBook(event) {
+    event.preventDefault();
+
+    const title = document.getElementById('title').value;
+    const author = document.getElementById('author').value;
+    const isbn = document.getElementById('isbn').value;
+    const genre = document.getElementById('genre').value;
+    const quantity = document.getElementById('quantity').value;
+
+    const payload = {
+        action: 'addBook',
+        title: title,
+        author: author,
+        isbn: isbn,
+        genre: genre,
+        quantity: quantity
+    };
+
+    try {
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        const result = await response.text();
+        document.getElementById('add-book-result').innerText = result;
+        fetchBooks(); // Refresh the list of books after adding
+    } catch (error) {
+        console.error('Error adding book:', error);
+        document.getElementById('add-book-result').innerText = 'Failed to add book. Try again.';
+    }
+
+    document.getElementById('add-book-form').reset();
+}
+
 // Initialize the app by fetching books on page load
 fetchBooks();
 
-// Attach event listener for the checkout form submission
+// Attach event listeners
 document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
+document.getElementById('admin-login-form').addEventListener('submit', handleAdminLogin);
+document.getElementById('add-book-form').addEventListener('submit', handleAddBook);
