@@ -1,4 +1,4 @@
-const scriptUrl = 'https://script.google.com/macros/s/AKfycby2JQciZNhv2V02BfL4VHVnIVeZK5yZuTbqdkxQcS6blfQoUaDADZZeob4FZp47zA/exec'; // Replace with your deployed Apps Script URL
+const scriptUrl = 'https://script.google.com/macros/s/AKfycbwOgmUXEHAq8Qm2wMVlbj4hGoVIe6rd0GhXVIgwYHHCK0YxEZfTJkX_0-dn4-s8nDM/exec'; // Replace with your deployed Apps Script URL
 
 // Fetch the list of books
 async function fetchBooks() {
