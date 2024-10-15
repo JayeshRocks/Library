@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbxXkMHZRoFi6WdTV7MIfHNzse4i22PLr7bZf7PzSKsWSAPhqRL8bCdz8jwZJxp_XAkw/exec'; // Replace with your Google Apps Script Web App URL
+const API_URL = 'https://script.google.com/macros/s/AKfycbyEv0lmHTVZ2Z7pTc0RUQ6vyHw9qvnyestzwTf39WAErtLHMRUiB-BkgBSJLQ85f5nx/exec'; // Replace with your Google Apps Script Web App URL
 
 document.addEventListener('DOMContentLoaded', () => {
   if (window.location.pathname.includes('index.html')) {
