@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Online Library</title>
+    <link rel="stylesheet" href="css/styles.css"> <!-- Link to your existing styles -->
+</head>
+<body>
+    <header>
+        <h1>Admin Portal</h1>
+        <nav>
+            <a href="admin_portal.html">Admin Dashboard</a>
+            <a href="add_book.html">Add Books</a>
+            <a href="logout.html">Logout</a>
+        </nav>
+    </header>
+
+    <div class="admin-section">
+        <h2>Manage Library</h2>
+        <button onclick="loadBooks()">View All Books</button>
+        <div id="booksTable"></div>
+
+        <h2>User Checkouts & Reservations</h2>
+        <button onclick="loadCheckouts()">View Checkouts</button>
+        <div id="checkoutsTable"></div>
+    </div>
+
+    <script src="js/admin_portal.js"></script> <!-- Link to admin portal JS -->
+</body>
+</html>

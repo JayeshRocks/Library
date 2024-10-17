@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Portal - Online Library</title>
+    <link rel="stylesheet" href="css/styles.css"> <!-- Link to your existing styles -->
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Online Library</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="user_portal.html">User Portal</a>
+            <a href="logout.html">Logout</a>
+        </nav>
+    </header>
+
+    <div class="search-section">
+        <h2>Browse Available Books</h2>
+        <input type="text" id="searchInput" placeholder="Search by title, author, or genre">
+        <button onclick="searchBooks()">Search</button>
+    </div>
+
+    <div id="booksList">
+        <!-- The books will be dynamically listed here -->
+    </div>
+
+    <div id="reservationSection" style="display:none;">
+        <h3>Reserve this book:</h3>
+        <button onclick="reserveBook()">Reserve</button>
+        <p id="reservationMessage"></p>
+    </div>
+
+    <script src="js/user_portal.js"></script> <!-- Link to user portal JS -->
+</body>
+</html>

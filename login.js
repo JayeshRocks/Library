@@ -2,7 +2,7 @@ async function sendOTP() {
     const email = document.getElementById('emailInput').value;
 
     // Send the email to Google Apps Script to trigger OTP email
-    const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/sendOTP', {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbzssFhy_ek3XQnZxI_NR5ZdkyMKWIifq7TMqQjULY4r-TQ-DvFL-f_8FnoPPq1MDEJ6/exec/sendOTP', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -22,7 +22,7 @@ async function verifyOTP() {
     const otp = document.getElementById('otpInput').value;
 
     // Send the OTP to Google Apps Script for verification
-    const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/verifyOTP', {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbzssFhy_ek3XQnZxI_NR5ZdkyMKWIifq7TMqQjULY4r-TQ-DvFL-f_8FnoPPq1MDEJ6/exec/verifyOTP', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ otp })
@@ -45,7 +45,7 @@ async function setPassword() {
     const hashedPassword = await sha256(password);
 
     // Send the hashed password to Google Apps Script to be saved
-    const response = await fetch('YOUR_GOOGLE_APPS_SCRIPT_URL/setPassword', {
+    const response = await fetch('https://script.google.com/macros/s/AKfycbzssFhy_ek3XQnZxI_NR5ZdkyMKWIifq7TMqQjULY4r-TQ-DvFL-f_8FnoPPq1MDEJ6/exec/setPassword', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: hashedPassword })
