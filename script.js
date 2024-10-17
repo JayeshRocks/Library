@@ -1,6 +1,6 @@
 // Fetch book data from Google Apps Script
 async function fetchBooks() {
-    const response = await fetch('https://script.google.com/macros/s/AKfycbxUugKxt9gzndl1k4WA2ntxm79A1tYVKe3hGFsW5jo3kUyLMQaJOkCvkr1hwUdfiRym/exec');
+    const response = await fetch('https://script.google.com/macros/s/AKfycbwAajOV6-lysaRgKrj65eqcjXXebBvRzASgIq8EWtJ77zmqijfRW2uLbuuPKQOekIev/exec');
     const books = await response.json();
     displayBooks(books);  // Use the same displayBooks function to render the data
 }

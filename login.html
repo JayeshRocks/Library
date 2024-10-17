@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Online Library</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Online Library</h2>
+        <input type="email" id="emailInput" placeholder="Enter your college email" required>
+        <button onclick="sendOTP()">Send OTP</button>
+
+        <div id="otpSection" style="display:none;">
+            <input type="text" id="otpInput" placeholder="Enter OTP" required>
+            <button onclick="verifyOTP()">Verify OTP</button>
+        </div>
+        
+        <div id="passwordSection" style="display:none;">
+            <input type="password" id="passwordInput" placeholder="Set your password" required>
+            <button onclick="setPassword()">Set Password</button>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
