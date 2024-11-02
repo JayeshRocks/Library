@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Online Library</title>
+
+    <!-- Favicons -->
+    <link rel="icon" sizes="16x16" href="imgs/favicon-16x16.png">
+    <link rel="icon" sizes="32x32" href="imgs/favicon-32x32.png">
+    <link rel="icon" sizes="96x96" href="imgs/favicon-96x96.png">
+    
+    <style>
+        /* Reset and body styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Responsive iframe styling */
+        .iframe-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+            background-color: #f5f5f5; /* Light background for contrast */
+        }
+        iframe {
+            border: none;
+            width: 100%;
+            height: 100%;
+            max-width: 1200px; /* Set a max width for larger screens */
+            max-height: 100vh;
+        }
+
+        /* Media queries for responsive adjustments */
+        @media (max-width: 768px) {
+            iframe {
+                max-width: 90%;
+                height: 90vh;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            iframe {
+                max-width: 95%;
+                height: 85vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="iframe-container">
+        <iframe 
+            src="https://script.google.com/macros/s/AKfycbxjKfULP0eHHednoT2nIPrB4IDNpsUW6nuZUXPyRT_f7JXU7N9ioUj__JW_Z6wPTxSQWA/exec" 
+            title="Embedded Google Apps Script Web App"
+            loading="lazy" 
+            allowfullscreen>
+        </iframe>
+    </div>
+</body>
+</html>
