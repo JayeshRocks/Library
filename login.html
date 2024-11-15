@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <base target="_top">
+
+    <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&display=swap&subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext,vietnamese" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script>
+        function changePage(page) {
+            google.script.run.withSuccessHandler((response) => {
+                document.open();
+                document.write(response);
+                document.close();
+            }).newPage(page);
+        }
+
+        function login() {
+            try {
+                const userInput = document.getElementById("userInput").value; // Combined input for username or email
+                const password = document.getElementById("passwordInput").value; // Password input
+
+                // Check if user input and password are provided
+                if (!userInput || !password) {
+                    M.toast({ html: "Please enter both username/email and password!" });
+                    return;
+                }
+
+                // Call the server-side login function
+                google.script.run.withSuccessHandler((response) => {
+                    if (response.success) {
+                        M.toast({ html: "Login successful!" });
+                        changePage('Dashboard'); // Redirect to the Dashboard after successful login
+                    } else {
+                        M.toast({ html: response.message });
+                    }
+                }).loginUser(userInput.toString(), password.toString()); // Call the server function to log in
+
+            } catch (error) {
+                console.error("Login failed: ", error);
+                M.toast({ html: "An error occurred during login." });
+            }
+        }
+
+        function goToSignup() {
+            changePage('Signup'); // Redirect to Signup page
+        }
+    </script>
+
+    <style>
+        .back-arrow {
+            position: absolute;
+            top: 20px; /* Adjust this value to position the icon vertically */
+            left: 20px; /* Adjust this value to position the icon horizontally */
+            font-size: 24px; /* Size of the icon */
+            color: #000; /* Icon color */
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Back Arrow Icon -->
+        <div class="back-arrow" onclick="changePage('Dashboard')">
+            <i class="material-icons">arrow_back</i>
+        </div>
+
+        <!-- Header Section -->
+        <div class="row" align="center">
+            <div class="col s12">
+                <h1 style="font-family: 'Bree Serif', serif;"><u>O</u>nline <u>L</u>ibrary</h1>
+                <h4 style="font-family: 'Open Sans', sans-serif;">Log In to Your Account</h4>
+            </div>
+        </div>
+
+        <!-- Login Form Section -->
+        <div class="row" align="center">
+            <div class="col s12 m8 l6 offset-m2 offset-l3 card">
+                <div class="card-content">
+
+                    <div class="input-field col s12">
+                        <input id="userInput" type="text" placeholder="Enter your username or email..." required>
+                        <label for="userInput">Username / Email</label>
+                    </div>
+
+                    <div class="input-field col s12">
+                        <input id="passwordInput" type="password" placeholder="Enter your password..." required>
+                        <label for="passwordInput">Password</label>
+                    </div>
+
+                    <button class="waves-effect btn blue" onclick="login()">Log In</button>
+
+                    <div class="center-align" style="margin-top: 20px;">
+                        <button class="elink" onclick="changePage('Signup')">Don't have an account? Sign Up</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
