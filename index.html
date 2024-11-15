@@ -74,6 +74,16 @@
             });
         }
 
+        function searchBooks() {
+            const query = document.getElementById('bookSearch').value.toLowerCase();
+            const filteredBooks = window.bookData.filter(book =>
+                book.title.toLowerCase().includes(query) ||
+                book.author.toLowerCase().includes(query) ||
+                String(book.isbn).includes(query)
+            );
+            displayBooks(filteredBooks);
+        }
+
         async function reserveBook(bookId, title) {
             const fromDate = document.getElementById(`fromDate-${bookId}`).value;
             const toDate = document.getElementById(`toDate-${bookId}`).value;
