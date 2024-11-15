@@ -20,7 +20,7 @@
 
     <script type="module">
         import { getDocs, collection, query, where } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
-        import { db } from './firebase-config.js'; // Import Firestore DB
+        import { db, auth } from './firebase-config.js'; // Import Firestore DB and Auth
     
         // Search for books in Firestore based on user input
         async function searchBooks() {
@@ -123,7 +123,7 @@
                 return;
             }
 
-            const user = auth.currentUser;
+            const user = auth.currentUser; // Using Firebase Auth to get the current user
             if (!user) {
                 M.toast({ html: "Please log in to reserve a book." });
                 return;
@@ -135,7 +135,7 @@
             const bookDoc = await bookRef.get(); // Get the book data
             if (bookDoc.exists && bookDoc.data().isAvailable) {
                 await bookRef.update({
-                    reservedBy: user.email,
+                    reservedBy: [...bookDoc.data().reservedBy, user.email],
                     isAvailable: false
                 });
 
