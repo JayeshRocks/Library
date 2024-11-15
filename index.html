@@ -12,8 +12,7 @@
     <link rel="icon" type="image/png" href="imgs/favicon-32x32.png">
 
     <!-- Materialize and other styles -->
-    <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300,400,600,700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
@@ -21,7 +20,7 @@
 
     <script type="module">
         import { getDocs, collection } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
-        import { db } from './firebase-config.js' // Import Firestore DB
+        import { db } from './firebase-config.js'; // Import Firestore DB
 
         let bookData = []; // Declare globally to store books
 
@@ -86,7 +85,6 @@
             );
             displayBooks(filteredBooks); // Call to display filtered books
         }
-
 
         // Function to reserve a book
         async function reserveBook(bookId, title) {
