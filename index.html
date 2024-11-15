@@ -2,11 +2,8 @@
 <html lang="en">
 
 <head>
+    <!-- Firebase config script (ensure it's a module) -->
     <script type="module" src="firebase-config.js"></script>
-    <!-- Other necessary Firebase scripts, make sure to load in modular order -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,10 +11,15 @@
     <base target="_top">
     <link rel="icon" type="image/png" href="imgs/favicon-32x32.png">
 
-    <script>
-        import { db, auth } from './firebase-config.js';  // Import db and auth from firebase-config.js
+    <!-- Materialize and other styles -->
+    <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
-        const db = firebase.firestore(); // Firestore instance
+    <script>
+        import { db, auth } from './firebase-config.js'; // Import db and auth from firebase-config.js
 
         async function onLoad() {
             const booksSnapshot = await db.collection("books").get();
@@ -25,6 +27,7 @@
             displayBooks(booksData);
         }
 
+        document.addEventListener("DOMContentLoaded", onLoad);
 
         function displayBooks(data) {
             const container = document.getElementById('bookListContainer');
@@ -73,7 +76,7 @@
                 return;
             }
 
-            const user = firebase.auth().currentUser;
+            const user = auth.currentUser;
             if (!user) {
                 M.toast({ html: "Please log in to reserve a book." });
                 return;
@@ -100,8 +103,6 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", onLoad);
-
         function searchBooks() {
             const query = document.getElementById('bookSearch').value.toLowerCase();
             const filteredBooks = window.bookData.filter(book =>
@@ -112,13 +113,6 @@
             displayBooks(filteredBooks);
         }
     </script>
-
-    <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300,400,600,700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
     <style>
         /* Top Padding for Login/Signup Buttons */
@@ -191,7 +185,7 @@
     </style>
 </head>
 
-<body onload="onLoad()">
+<body>
     <div class="container">
         <!-- Login, Sign Up, and Admin Dashboard Button Container -->
         <div id="loginSignupContainer" align="right">
