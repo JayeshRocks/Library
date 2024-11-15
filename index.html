@@ -22,21 +22,8 @@
     <script type="module">
         import { getDocs, collection } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
         import { db } from './firebase-config.js' // Import Firestore DB
-    </script>
 
-    <script>
         let bookData = []; // Declare globally to store books
-
-        // Function to filter books based on search query
-        function searchBooks() {
-            const query = document.getElementById('bookSearch').value.toLowerCase();
-            const filteredBooks = bookData.filter(book =>
-                book.title.toLowerCase().includes(query) ||
-                book.author.toLowerCase().includes(query) ||
-                String(book.isbn).includes(query)
-            );
-            displayBooks(filteredBooks); // Call to display filtered books
-        }
 
         // Load books from Firestore and display them
         async function onLoad() {
@@ -87,6 +74,19 @@
                 container.appendChild(bookElement); // Append book to the list
             });
         }
+    </script>
+
+    <script>
+        function searchBooks() {
+            const query = document.getElementById('bookSearch').value.toLowerCase();
+            const filteredBooks = bookData.filter(book =>
+                book.title.toLowerCase().includes(query) ||
+                book.author.toLowerCase().includes(query) ||
+                String(book.isbn).includes(query)
+            );
+            displayBooks(filteredBooks); // Call to display filtered books
+        }
+
 
         // Function to reserve a book
         async function reserveBook(bookId, title) {
