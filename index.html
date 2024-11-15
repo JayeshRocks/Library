@@ -20,31 +20,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
     <script type="module">
-        // Firebase imports from CDN
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
-        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-analytics.js';
-        import { getAuth } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+        import { db, auth } from './firebase-config.js';  // Import Firebase services
 
-        // Initialize Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyAMoJGj_DJH_PETHpxbAIlZK4X7qV-S1v0",
-            authDomain: "lib-management-sys-17120.firebaseapp.com",
-            projectId: "lib-management-sys-17120",
-            storageBucket: "lib-management-sys-17120.appspot.com",
-            messagingSenderId: "800291285303",
-            appId: "1:800291285303:web:bdc678c791bc1e09a3d2b2",
-            measurementId: "G-PQ2KM5ZC5W"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-    </script>
-
-    <script>
-        // Firebase logic for loading and reserving books
         async function onLoad() {
             const booksSnapshot = await db.collection("books").get();
             const booksData = booksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
