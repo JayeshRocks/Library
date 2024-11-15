@@ -21,8 +21,10 @@
 
     <script type="module">
         import { getDocs, collection } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
-        import { db } from './firebase-config.js'; // Import Firestore DB
+        import { db } from './firebase-config.js' // Import Firestore DB
+    </script>
 
+    <script>
         let bookData = []; // Declare globally to store books
 
         // Function to filter books based on search query
