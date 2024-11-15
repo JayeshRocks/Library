@@ -12,7 +12,8 @@
     <link rel="icon" type="image/png" href="imgs/favicon-32x32.png">
 
     <!-- Materialize and other styles -->
-    <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300,400,600,700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
@@ -21,38 +22,33 @@
     <script type="module">
         import { getDocs, collection, query, where } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
         import { db, auth } from './firebase-config.js'; // Import Firestore DB and Auth
-    
+
         // Search for books in Firestore based on user input
         async function searchBooks() {
-            const queryTerm = document.getElementById('bookSearch').value.toLowerCase(); // Get search query from input field
-    
-            // If the query is empty, reload all books
+            const queryTerm = document.getElementById('bookSearch').value.toLowerCase();
             if (!queryTerm) {
-                onLoad(); // Calls onLoad to fetch and display all books
+                onLoad();
                 return;
             }
-    
+
             try {
-                // Reference to Firestore collection
                 const booksCollectionRef = collection(db, "books");
-    
-                // Firestore query to search books by title, author, or ISBN
-                const booksQuery = query(booksCollectionRef, 
+                const booksQuery = query(booksCollectionRef,
                     where("title", ">=", queryTerm),
-                    where("title", "<=", queryTerm + '\uf8ff') // Perform case-insensitive search
+                    where("title", "<=", queryTerm + '\uf8ff') // Case-insensitive search
                 );
-                
-                const booksSnapshot = await getDocs(booksQuery); // Fetch filtered books
-    
+                const booksSnapshot = await getDocs(booksQuery);
+
                 const filteredBooks = booksSnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
-    
-                displayBooks(filteredBooks); // Call the display function with filtered results
-    
+
+                console.log(filteredBooks); // Debugging line to verify query results
+                displayBooks(filteredBooks);
+
             } catch (error) {
-                console.error("Error searching books:", error);
+                console.error("Error searching books:", error); // Log the error for troubleshooting
             }
         }
 
@@ -65,47 +61,47 @@
                     id: doc.id,
                     ...doc.data()
                 }));
-                
+
                 displayBooks(books); // Display all books
             } catch (error) {
                 console.error("Error loading books:", error);
             }
         }
-    
+
         // Function to display books on the page
         function displayBooks(data) {
+            console.log(data); // Add this to check if data is passed correctly
             const container = document.getElementById('bookListContainer');
             container.innerHTML = ""; // Clear previous results
-    
-            // Separate available and unavailable books
+
             const availableBooks = data.filter(book => book.isAvailable);
             const unavailableBooks = data.filter(book => !book.isAvailable);
-    
-            // Sort and display books
+
             const sortedBooks = [...availableBooks, ...unavailableBooks];
             sortedBooks.forEach(book => {
                 const bookElement = document.createElement('div');
                 bookElement.className = 'col s12 m6 l4';
                 bookElement.innerHTML = `  
-                    <div class="card hoverable">
-                        <div class="card-content">
-                            <span class="card-title">${book.title}</span>
-                            <p><strong>Author:</strong> ${book.author}</p>
-                            <p><strong>ISBN:</strong> ${book.isbn}</p>
-                            <input type="date" id="fromDate-${book.id}" placeholder="From Date" ${book.isAvailable ? '' : 'disabled'}>
-                            <input type="date" id="toDate-${book.id}" placeholder="To Date" ${book.isAvailable ? '' : 'disabled'}>
-                        </div>
-                        <div class="card-action">
-                            <button class="waves-effect btn ${book.isAvailable ? 'blue' : 'grey lighten-1'}"
-                                    onclick="${book.isAvailable ? `reserveBook('${book.id}','${book.title}')` : 'event.preventDefault();'}"
-                                    ${book.isAvailable ? '' : 'disabled'}>
-                                ${book.isAvailable ? 'Reserve' : 'Unavailable'}
-                            </button>
-                        </div>
-                    </div>`;
-                container.appendChild(bookElement); // Append book to list
+            <div class="card hoverable">
+                <div class="card-content">
+                    <span class="card-title">${book.title}</span>
+                    <p><strong>Author:</strong> ${book.author}</p>
+                    <p><strong>ISBN:</strong> ${book.isbn}</p>
+                    <input type="date" id="fromDate-${book.id}" placeholder="From Date" ${book.isAvailable ? '' : 'disabled'}>
+                    <input type="date" id="toDate-${book.id}" placeholder="To Date" ${book.isAvailable ? '' : 'disabled'}>
+                </div>
+                <div class="card-action">
+                    <button class="waves-effect btn ${book.isAvailable ? 'blue' : 'grey lighten-1'}"
+                            onclick="${book.isAvailable ? `reserveBook('${book.id}','${book.title}')` : 'event.preventDefault();'}"
+                            ${book.isAvailable ? '' : 'disabled'}>
+                        ${book.isAvailable ? 'Reserve' : 'Unavailable'}
+                    </button>
+                </div>
+            </div>`;
+                container.appendChild(bookElement);
             });
         }
+
     </script>
 
     <script>
