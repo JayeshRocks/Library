@@ -23,42 +23,44 @@
         import { getDocs, collection } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
         import { db } from './firebase-config.js'; // Import Firestore DB
 
+        let bookData = []; // Declare globally to store books
+
+        // Function to filter books based on search query
         function searchBooks() {
             const query = document.getElementById('bookSearch').value.toLowerCase();
-            const filteredBooks = window.bookData.filter(book =>
+            const filteredBooks = bookData.filter(book =>
                 book.title.toLowerCase().includes(query) ||
                 book.author.toLowerCase().includes(query) ||
                 String(book.isbn).includes(query)
             );
-            displayBooks(filteredBooks);
+            displayBooks(filteredBooks); // Call to display filtered books
         }
 
+        // Load books from Firestore and display them
         async function onLoad() {
             try {
-                // Get reference to the 'books' collection
-                const booksCollectionRef = collection(db, "books");
-
-                // Get all documents in the books collection
-                const booksSnapshot = await getDocs(booksCollectionRef);
-
-                const booksData = booksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                displayBooks(booksData);
+                const booksCollectionRef = collection(db, "books"); // Get reference to 'books' collection
+                const booksSnapshot = await getDocs(booksCollectionRef); // Fetch documents from Firestore
+                bookData = booksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                displayBooks(bookData); // Display all books
             } catch (error) {
-                console.error("Error fetching books:", error);
+                console.error("Error fetching books:", error); // Error handling
             }
         }
 
+        // Trigger onLoad function after page load
         document.addEventListener("DOMContentLoaded", onLoad);
 
+        // Function to display books on the page
         function displayBooks(data) {
             const container = document.getElementById('bookListContainer');
-            container.innerHTML = "";
+            container.innerHTML = ""; // Clear the container before adding books
 
             // Separate available and unavailable books
             const availableBooks = data.filter(book => book.isAvailable);
             const unavailableBooks = data.filter(book => !book.isAvailable);
 
-            // Sort and display
+            // Sort and display the books
             const sortedBooks = [...availableBooks, ...unavailableBooks];
             sortedBooks.forEach(book => {
                 const bookElement = document.createElement('div');
@@ -80,10 +82,11 @@
                             </button>
                         </div>
                     </div>`;
-                container.appendChild(bookElement);
+                container.appendChild(bookElement); // Append book to the list
             });
         }
 
+        // Function to reserve a book
         async function reserveBook(bookId, title) {
             const fromDate = document.getElementById(`fromDate-${bookId}`).value;
             const toDate = document.getElementById(`toDate-${bookId}`).value;
@@ -106,7 +109,7 @@
             const userRef = db.collection("users").doc(user.uid);
             const bookRef = db.collection("books").doc(bookId);
 
-            const bookDoc = await bookRef.get();
+            const bookDoc = await bookRef.get(); // Get the book data
             if (bookDoc.exists && bookDoc.data().isAvailable) {
                 await bookRef.update({
                     reservedBy: user.email,
@@ -118,7 +121,7 @@
                 });
 
                 M.toast({ html: `${title} reserved successfully!` });
-                onLoad();  // Refresh the book list after reservation
+                onLoad();  // Refresh book list after reservation
             } else {
                 M.toast({ html: "Book is already reserved." });
             }
@@ -126,23 +129,21 @@
     </script>
 
     <style>
-        /* Top Padding for Login/Signup Buttons */
+        /* Styling for the login/signup buttons */
         #loginSignupContainer {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
             margin-top: 20px;
-            /* Adds top padding */
         }
 
-        /* Hover Tab Styles */
+        /* Hover tab styles */
         .hover-tab {
             position: fixed;
             top: 20px;
             left: 20px;
             display: inline-block;
             z-index: 9999;
-            /* Ensures the hover tab has the highest stacking order */
         }
 
         .hover-content {
@@ -152,10 +153,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             padding: 10px;
             z-index: 9999;
-            /* Ensures the hover content appears above all other content */
             width: auto;
             min-width: 200px;
-            white-space: nowrap;
             opacity: 0;
             transform: translateY(10px);
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
@@ -167,7 +166,7 @@
             transform: translateY(0);
         }
 
-        /* Account Icon Styles */
+        /* Account icon styles */
         .account-icon {
             width: 40px;
             height: 40px;
@@ -175,17 +174,16 @@
             cursor: pointer;
         }
 
-        /* Button Styling */
+        /* Styling for buttons */
         .logout-button,
         #adminDashboardButton,
         .hover-tab button {
             margin-top: 10px;
             width: 100%;
-            /* Stretch buttons to fit the hover tab width */
             display: block;
         }
 
-        /* Button Hover Effects */
+        /* Button hover effects */
         button {
             transition: background-color 0.3s, color 0.3s;
         }
