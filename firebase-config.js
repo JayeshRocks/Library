@@ -1,11 +1,8 @@
-// firebase-config.js
-
-// Import the Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-analytics.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
-// Firebase configuration details
+
 const firebaseConfig = {
     apiKey: "AIzaSyAMoJGj_DJH_PETHpxbAIlZK4X7qV-S1v0",
     authDomain: "lib-management-sys-17120.firebaseapp.com",
@@ -16,10 +13,6 @@ const firebaseConfig = {
     measurementId: "G-PQ2KM5ZC5W"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 const db = getFirestore(app);
-
-// Export the Firestore instance
-export { db };
+const auth = getAuth(app);
