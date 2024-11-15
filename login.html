@@ -13,14 +13,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script src="firebase-config.js"></script> <!-- Your Firebase configuration -->
+
     <script>
-        function changePage(page) {
-            google.script.run.withSuccessHandler((response) => {
-                document.open();
-                document.write(response);
-                document.close();
-            }).newPage(page);
-        }
+        const auth = firebase.auth(); // Firebase authentication instance
 
         function login() {
             try {
@@ -33,15 +32,18 @@
                     return;
                 }
 
-                // Call the server-side login function
-                google.script.run.withSuccessHandler((response) => {
-                    if (response.success) {
+                // Firebase authentication login
+                auth.signInWithEmailAndPassword(userInput, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
                         M.toast({ html: "Login successful!" });
-                        changePage('Dashboard'); // Redirect to the Dashboard after successful login
-                    } else {
-                        M.toast({ html: response.message });
-                    }
-                }).loginUser(userInput.toString(), password.toString()); // Call the server function to log in
+
+                        // Redirect to the dashboard after successful login
+                        window.location.href = "index.html"; // Normal HTML redirect
+                    })
+                    .catch((error) => {
+                        M.toast({ html: `Login failed: ${error.message}` });
+                    });
 
             } catch (error) {
                 console.error("Login failed: ", error);
@@ -50,7 +52,7 @@
         }
 
         function goToSignup() {
-            changePage('Signup'); // Redirect to Signup page
+            window.location.href = "signup.html"; // Redirect to Signup page
         }
     </script>
 
@@ -70,7 +72,7 @@
     <div class="container">
 
         <!-- Back Arrow Icon -->
-        <div class="back-arrow" onclick="changePage('Dashboard')">
+        <div class="back-arrow" onclick="window.location.href='index.html'">
             <i class="material-icons">arrow_back</i>
         </div>
 
@@ -100,7 +102,7 @@
                     <button class="waves-effect btn blue" onclick="login()">Log In</button>
 
                     <div class="center-align" style="margin-top: 20px;">
-                        <button class="elink" onclick="changePage('Signup')">Don't have an account? Sign Up</button>
+                        <button class="elink" onclick="goToSignup()">Don't have an account? Sign Up</button>
                     </div>
 
                 </div>

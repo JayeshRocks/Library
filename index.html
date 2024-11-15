@@ -7,113 +7,20 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <base target="_top">
 
+    <!-- Firebase configuration script -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+    <script src="firebase-config.js"></script> <!-- Your Firebase configuration -->
+
     <script>
+        const db = firebase.firestore(); // Firestore instance
 
-    if (typeof jQuery === 'undefined') {
-        console.error("jQuery is not loaded.");
-    } else {
-        console.log("jQuery loaded successfully.");
-    }
-
-        function changePage(page) {
-            document.open();
-            document.write(page);
-            document.close();
+        async function onLoad() {
+            const booksSnapshot = await db.collection("books").get();
+            const booksData = booksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            displayBooks(booksData);
         }
-
-        function onLoad() {
-            google.script.run.withSuccessHandler(setUserAccountTab).loadUserAccountTab();
-            google.script.run.withSuccessHandler(onSuccess).getAvailableBooks();
-        }
-
-        function setUserAccountTab(data) {
-            //console.log('User Data:', data);
-            const userDisplayName = document.getElementById('userDisplayName');
-            const userEmailDisplay = document.getElementById('userEmailDisplay');
-            const adminDashboardButton = document.getElementById('adminDashboardButton');
-            const loginSignupContainer = document.getElementById('loginSignupContainer');
-            const userStatus = document.getElementById("userStatus");
-            const logoutButton = document.getElementById("logoutButton");
-
-            if (userDisplayName) {
-                userDisplayName.innerText = data.name || 'Guest';
-            }
-            if (userEmailDisplay) {
-                userEmailDisplay.innerText = data.email || '';
-            }
-
-            userStatus.innerText = data.accessType ? `Logged in as ${data.name}` : "Logged in as Guest";
-
-            if (data.accessType === 'Admin') {
-                adminDashboardButton.style.display = 'block';
-                loginSignupContainer.style.display = 'none';
-            } else {
-                adminDashboardButton.style.display = 'none';
-                loginSignupContainer.style.display = 'block';
-            }
-
-            logoutButton.style.display = data.email ? 'block' : 'none';
-        }
-
-        function onSuccess(data) {
-            window.bookData = data;
-            displayBooks(data);
-        }
-
-        function reserveBook(isbn, title) {
-            google.script.run.withSuccessHandler((response) => {
-                if (!response.loggedIn) {
-                    M.toast({ html: "You must be logged in to reserve a book." });
-                    return;
-                }
-
-                const fromDate = document.getElementById(`fromDate-${isbn}`).value;
-                const toDate = document.getElementById(`toDate-${isbn}`).value;
-
-                if (!fromDate || !toDate) {
-                    M.toast({ html: "Please select both start and end dates." });
-                    return;
-                }
-
-                if (new Date(fromDate) >= new Date(toDate)) {
-                    M.toast({ html: "The end date must be after the start date." });
-                    return;
-                }
-
-                google.script.run.withSuccessHandler((response) => {
-                    M.toast({ html: response.message });
-                    google.script.run.withSuccessHandler(onSuccess).getAvailableBooks();
-                }).reserveSelectedBook(title, isbn, fromDate, toDate);
-            }).isUserLoggedIn();
-        }
-
-        function checkLoginStatus() {
-            google.script.run.withSuccessHandler((response) => {
-                const userStatus = document.getElementById("userStatus");
-                const loginPrompt = document.getElementById("loginPrompt");
-
-                if (response.loggedIn) {
-                    if (userStatus) {
-                        userStatus.innerHTML = "Welcome, " + response.username;
-                    }
-                    if (loginPrompt) {
-                        loginPrompt.style.display = "none";
-                    }
-                } else {
-                    if (userStatus) {
-                        userStatus.innerHTML = "";
-                    }
-                    if (loginPrompt) {
-                        loginPrompt.style.display = "block";
-                    }
-                }
-            }).isUserLoggedIn();
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            checkLoginStatus();
-            onLoad();
-        });
 
         function displayBooks(data) {
             const container = document.getElementById('bookListContainer');
@@ -123,29 +30,24 @@
             const availableBooks = data.filter(book => book.isAvailable);
             const unavailableBooks = data.filter(book => !book.isAvailable);
 
-            // Sort both lists alphabetically by title
-            availableBooks.sort((a, b) => a.title.localeCompare(b.title));
-            unavailableBooks.sort((a, b) => a.title.localeCompare(b.title));
-
-            // Combine the lists
+            // Sort and display
             const sortedBooks = [...availableBooks, ...unavailableBooks];
-
             sortedBooks.forEach(book => {
                 const bookElement = document.createElement('div');
                 bookElement.className = 'col s12 m6 l4';
-                bookElement.innerHTML =
-                    `<div class="card hoverable">
+                bookElement.innerHTML = `
+                    <div class="card hoverable">
                         <div class="card-content">
                             <span class="card-title">${book.title}</span>
                             <p><strong>Author:</strong> ${book.author}</p>
                             <p><strong>ISBN:</strong> ${book.isbn}</p>
-                            <input type="date" id="fromDate-${book.isbn}" placeholder="From Date" style="display: ${book.isAvailable ? 'block' : 'none'};">
-                            <input type="date" id="toDate-${book.isbn}" placeholder="To Date" style="display: ${book.isAvailable ? 'block' : 'none'};">
+                            <input type="date" id="fromDate-${book.id}" placeholder="From Date" ${book.isAvailable ? '' : 'disabled'}>
+                            <input type="date" id="toDate-${book.id}" placeholder="To Date" ${book.isAvailable ? '' : 'disabled'}>
                         </div>
                         <div class="card-action">
-                            <button class="waves-effect btn ${book.isAvailable ? 'blue' : 'grey lighten-1'}" 
-                                    onclick="${book.isAvailable ? `reserveBook('${book.isbn}','${book.title}')` : 'event.preventDefault();'}"
-                                    style="${book.isAvailable ? '' : 'color: #4a4a4a; cursor: not-allowed;'}">
+                            <button class="waves-effect btn ${book.isAvailable ? 'blue' : 'grey lighten-1'}"
+                                    onclick="${book.isAvailable ? `reserveBook('${book.id}','${book.title}')` : 'event.preventDefault();'}"
+                                    ${book.isAvailable ? '' : 'disabled'}>
                                 ${book.isAvailable ? 'Reserve' : 'Unavailable'}
                             </button>
                         </div>
@@ -154,46 +56,57 @@
             });
         }
 
+        async function reserveBook(bookId, title) {
+            const fromDate = document.getElementById(`fromDate-${bookId}`).value;
+            const toDate = document.getElementById(`toDate-${bookId}`).value;
+
+            if (!fromDate || !toDate) {
+                M.toast({ html: "Please select both start and end dates." });
+                return;
+            }
+            if (new Date(fromDate) >= new Date(toDate)) {
+                M.toast({ html: "The end date must be after the start date." });
+                return;
+            }
+
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                M.toast({ html: "Please log in to reserve a book." });
+                return;
+            }
+
+            const userRef = db.collection("users").doc(user.uid);
+            const bookRef = db.collection("books").doc(bookId);
+
+            const bookDoc = await bookRef.get();
+            if (bookDoc.exists && bookDoc.data().isAvailable) {
+                await bookRef.update({
+                    reservedBy: user.email,
+                    isAvailable: false
+                });
+
+                await userRef.update({
+                    [`reservedBooks.${bookDoc.data().isbn}`]: user.email
+                });
+
+                M.toast({ html: `${title} reserved successfully!` });
+                onLoad();  // Refresh the book list after reservation
+            } else {
+                M.toast({ html: "Book is already reserved." });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", onLoad);
+
         function searchBooks() {
             const query = document.getElementById('bookSearch').value.toLowerCase();
             const filteredBooks = window.bookData.filter(book =>
-                book.title.toString().toLowerCase().includes(query) ||
-                book.author.toString().toLowerCase().includes(query) ||
+                book.title.toLowerCase().includes(query) ||
+                book.author.toLowerCase().includes(query) ||
                 String(book.isbn).includes(query)
             );
             displayBooks(filteredBooks);
         }
-
-        function logout() {
-            google.script.run.withSuccessHandler(() => {
-                M.toast({ html: "Logged out successfully!" });
-                setTimeout(() => google.script.run.withSuccessHandler(changePage).newPage('Login'), 1000);
-            }).logoutUser();
-        }
-
-        function redirectToLogin() {
-            google.script.run.withSuccessHandler(changePage).newPage('Login');
-        }
-        function redirectToSignup() {
-            google.script.run.withSuccessHandler(changePage).newPage('Signup');
-        }
-
-        function goToAdminDashboard() {
-            google.script.run.withSuccessHandler((accessType) => {
-                if (accessType === 'Admin') {
-                    changePage('Admin');
-                } else {
-                    M.toast({ html: "Access denied." });
-                }
-            }).checkUserAccess();
-        }
-
-        $(document).ready(function() {
-    checkLoginStatus();
-    onLoad();
-});
-
-
     </script>
 
     <link href="https://fonts.googleapis.com/css?family=Bree+Serif|Open+Sans:300,400,600,700&display=swap" rel="stylesheet">
