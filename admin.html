@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Library Management System</title>
+    <link rel="stylesheet" href="admin.css">
+    <link rel="icon" href="imgs/favicon-96x96.png" type="image/png">
+
+    <!-- Firebase Modular SDK Libraries -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, query, orderBy, where, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMoJGj_DJH_PETHpxbAIlZK4X7qV-S1v0",
+            authDomain: "lib-management-sys-17120.firebaseapp.com",
+            projectId: "lib-management-sys-17120",
+            storageBucket: "lib-management-sys-17120.appspot.com",
+            messagingSenderId: "800291285303",
+            appId: "1:800291285303:web:5423155460105d06a3d2b2",
+            measurementId: "G-RKL7RBDP5Q"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        document.addEventListener("DOMContentLoaded", function () {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    fetchDashboardStats();
+                    displayBooks();
+                    displayReservations();
+                    updateUserStatus(user);
+                } else {
+                    // No user logged in
+                    updateUserStatus(null);
+                }
+            });
+        });
+
+        // Update User Status Display
+        function updateUserStatus(user) {
+            const userStatus = document.getElementById("accountStatus");
+            const userDetails = document.getElementById("accountDetails");
+
+            const login = document.getElementById("login");
+            const signup = document.getElementById("signup");
+            const logout = document.getElementById("logout");
+
+            if (user) {
+                userStatus.textContent = `Logged in as ${user.displayName || user.email}`;
+                userDetails.textContent = user.displayName || user.email;
+
+                login.classList.add("hidden");
+                signup.classList.add("hidden");
+                logout.classList.remove("hidden");
+            } else {
+                userStatus.textContent = "Browsing as Guest";
+                userDetails.textContent = "";
+
+                login.classList.remove("hidden");
+                signup.classList.remove("hidden");
+                logout.classList.add("hidden");
+            }
+
+            // Logout functionality
+            logout.onclick = () => {
+                auth.signOut().then(() => {
+                    alert("Logged out successfully!");
+                    window.location.reload();
+                }).catch((error) => {
+                    console.error("Logout error:", error);
+                });
+            };
+        }
+
+        // Fetch Dashboard Stats
+        async function fetchDashboardStats() {
+            const booksRef = collection(db, "books");
+            const usersRef = collection(db, "users");
+            const reservationsRef = collection(db, "reservations");
+
+            const totalBooks = (await getDocs(booksRef)).size;
+            const totalUsers = (await getDocs(usersRef)).size;
+
+            const now = new Date();
+            const overdueReservations = (await getDocs(query(reservationsRef, where("dueDate", "<", now)))).size;
+
+            document.getElementById("totalBooks").textContent = totalBooks;
+            document.getElementById("totalUsers").textContent = totalUsers;
+            document.getElementById("overdueBooks").textContent = overdueReservations;
+        }
+
+        // Display Books in Admin Dashboard
+        async function displayBooks() {
+            const booksRef = collection(db, "books");
+            const booksSnapshot = await getDocs(booksRef);
+
+            let booksHtml = `<h3>Books in Database:</h3>`;
+            booksHtml += `<table><thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Actions</th></tr></thead><tbody>`;
+            booksSnapshot.forEach((doc) => {
+                const book = doc.data();
+                booksHtml += `
+                    <tr>
+                        <td>${book.title}</td>
+                        <td>${book.author}</td>
+                        <td>${book.isbn}</td>
+                        <td>
+                            <button onclick="modifyBook('${doc.id}')">Modify</button>
+                            <button onclick="removeBook('${doc.id}')">Remove</button>
+                        </td>
+                    </tr>`;
+            });
+            booksHtml += `</tbody></table>`;
+            document.getElementById("booksSection").innerHTML = booksHtml;
+        }
+
+        // Modify Book
+        async function modifyBook(bookId) {
+            const bookRef = doc(db, "books", bookId);
+            const book = (await getDoc(bookRef)).data();
+            const newTitle = prompt("Edit Title", book.title);
+            const newAuthor = prompt("Edit Author", book.author);
+            if (newTitle && newAuthor) {
+                await updateDoc(bookRef, { title: newTitle, author: newAuthor });
+                alert("Book updated successfully!");
+                displayBooks();
+            }
+        }
+
+        // Remove Book
+        async function removeBook(bookId) {
+            await updateDoc(doc(db, "books", bookId), { isAvailable: false });
+            alert("Book removed successfully!");
+            displayBooks();
+        }
+
+        // Display Reservations
+        async function displayReservations() {
+            const reservationsRef = collection(db, "reservations");
+            const reservationsSnapshot = await getDocs(query(reservationsRef, orderBy("reservationDate", "desc")));
+
+            let reservationsHtml = `<h3>Reservations:</h3>`;
+            reservationsHtml += `<table><thead><tr><th>User</th><th>Book</th><th>Reserved Date</th><th>Due Date</th><th>Actions</th></tr></thead><tbody>`;
+            reservationsSnapshot.forEach((doc) => {
+                const reservation = doc.data();
+                reservationsHtml += `
+                    <tr>
+                        <td>${reservation.reservedBy}</td>
+                        <td>${reservation.isbn}</td>
+                        <td>${reservation.reservationDate.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
+                        <td>${reservation.dueDate.toDate().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</td>
+                        <td>
+                            <button onclick="markAsReturned('${doc.id}')">Mark as Returned</button>
+                        </td>
+                    </tr>`;
+            });
+            reservationsHtml += `</tbody></table>`;
+            document.getElementById("reservationsSection").innerHTML = reservationsHtml;
+        }
+
+        // Mark Reservation as Returned
+        async function markAsReturned(reservationId) {
+            const reservationRef = doc(db, "reservations", reservationId);
+            await updateDoc(reservationRef, { status: "Returned" });
+            alert("Reservation marked as returned!");
+            displayReservations();
+        }
+
+        // Make functions globally accessible
+        window.modifyBook = modifyBook;
+        window.removeBook = removeBook;
+        window.displayBooks = displayBooks;
+        window.fetchDashboardStats = fetchDashboardStats;
+        window.displayReservations = displayReservations;
+        window.markAsReturned = markAsReturned;
+        window.updateUserStatus = updateUserStatus;
+
+    </script>
+</head>
+
+<body>
+    <div id="navbar">
+        <div class="navbar-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="userReservations.html" id="myReservations" class="hidden">My Reservations</a>
+            <a href="admin.html" id="adminDashboard" class="hidden">Admin Dashboard</a>
+            <a href="login.html" id="login">Log In</a>
+            <a href="signup.html" id="signup">Sign Up</a>
+            <a href="javascript:void(0);" id="logout" class="hidden">Log Out</a>
+        </div>
+        <div class="account-dropdown">
+            <img src="imgs/accounts-icon.png" alt="Account" class="account-icon">
+            <div class="dropdown-content">
+                <p id="accountStatus">Browsing as Guest</p>
+                <p id="accountDetails"></p>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <section id="statsSection">
+            <h2>Dashboard Statistics</h2>
+            <p>Total Books: <span id="totalBooks">0</span></p>
+            <p>Total Users: <span id="totalUsers">0</span></p>
+            <p>Overdue Books: <span id="overdueBooks">0</span></p>
+        </section>
+
+        <section id="booksSection"></section>
+        <section id="reservationsSection"></section>
+    </main>
+</body>
+
+</html>

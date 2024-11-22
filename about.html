@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Library Management System</title>
+    <link rel="stylesheet" href="about.css">
+    <link rel="icon" href="imgs/favicon-96x96.png" type="image/png">
+
+    <!-- Firebase Modular SDK Libraries -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, query, orderBy, limit, startAfter, where, doc, getDoc, setDoc, updateDoc, arrayUnion } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js';
+        window.firebaseFirestore = { getFirestore, setDoc, collection, getDocs, query, orderBy, limit, startAfter, where, doc, getDoc, updateDoc, arrayUnion }; // Include all necessary methods
+
+        // Firebase Initialization
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMoJGj_DJH_PETHpxbAIlZK4X7qV-S1v0",
+            authDomain: "lib-management-sys-17120.firebaseapp.com",
+            projectId: "lib-management-sys-17120",
+            storageBucket: "lib-management-sys-17120.appspot.com",
+            messagingSenderId: "800291285303",
+            appId: "1:800291285303:web:5423155460105d06a3d2b2",
+            measurementId: "G-RKL7RBDP5Q"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let user = null;
+
+        // Wait for DOM content to load
+        document.addEventListener("DOMContentLoaded", function () {
+            // Listen for changes in the user's authentication state
+            onAuthStateChanged(auth, (currentUser) => {
+                user = currentUser;
+                updateUserStatus();
+            });
+        });
+
+        // User Status Update
+        function updateUserStatus() {
+            const userStatus = document.getElementById("accountStatus");
+            const userDetails = document.getElementById("accountDetails");
+
+            // Navbar links
+            const myReservations = document.getElementById("myReservations");
+            const adminDashboard = document.getElementById("adminDashboard");
+            const login = document.getElementById("login");
+            const signup = document.getElementById("signup");
+            const logout = document.getElementById("logout");
+
+            if (user) {
+                // Fetch user data
+                const userRef = doc(db, "users", user.uid);
+                getDoc(userRef)
+                    .then((docSnapshot) => {
+                        if (docSnapshot.exists()) {
+                            const userData = docSnapshot.data();
+                            const userName = userData.name || "User";
+                            const userEmail = userData.email;
+                            const accessType = userData.accessType;
+
+                            // Update account dropdown
+                            userStatus.textContent = `Logged in as ${userName}`;
+                            userDetails.textContent = `${userEmail}`;
+
+                            // Show/hide links based on user role
+                            if (accessType === "Admin") {
+                                adminDashboard.classList.remove("hidden");
+                            } else {
+                                adminDashboard.classList.add("hidden");
+                            }
+                            myReservations.classList.remove("hidden");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching user data:", error);
+                        userStatus.textContent = "Error fetching user data.";
+                    });
+
+                // Show logout, hide login and signup
+                login.classList.add("hidden");
+                signup.classList.add("hidden");
+                logout.classList.remove("hidden");
+            } else {
+                // Guest user
+                userStatus.textContent = "Browsing as Guest";
+                userDetails.textContent = "";
+
+                // Hide admin/dashboard links
+                myReservations.classList.add("hidden");
+                adminDashboard.classList.add("hidden");
+
+                // Show login and signup, hide logout
+                login.classList.remove("hidden");
+                signup.classList.remove("hidden");
+                logout.classList.add("hidden");
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="navbar">
+        <div class="navbar-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="userReservations.html" id="myReservations" class="hidden">My Reservations</a>
+            <a href="admin.html" id="adminDashboard" class="hidden">Admin Dashboard</a>
+            <a href="login.html" id="login">Log In</a>
+            <a href="signup.html" id="signup">Sign Up</a>
+            <a href="javascript:void(0);" id="logout" class="hidden">Log Out</a>
+        </div>
+        <div class="account-dropdown">
+            <img src="imgs/accounts-icon.png" alt="Account" class="account-icon">
+            <div class="dropdown-content">
+                <p id="accountStatus">Browsing as Guest</p>
+                <p id="accountDetails"></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-section">
+        <div class="about-container">
+            <h1 class="about-title">About the Library Management System</h1>
+            <p class="about-description">
+                Welcome to the Library Management System! This is a web-based application developed to help users
+                effectively manage library books and their reservations. Users can browse through available books,
+                check their status, and reserve them for later use. For administrators, the system provides additional
+                functionality to manage and monitor books and reservations.
+            </p>
+
+            <div class="about-features">
+                <h2 class="section-title">Features</h2>
+                <ul>
+                    <li>Browse books by categories and availability</li>
+                    <li>Reserve books online for a later date</li>
+                    <li>View and manage your reservations</li>
+                    <li>Admin dashboard for managing books and reservations</li>
+                </ul>
+            </div>
+
+            <div class="about-technologies">
+                <h2 class="section-title">Technologies Used</h2>
+                <ul>
+                    <li>HTML, CSS, JavaScript for front-end development</li>
+                    <li>Firebase for database management and authentication</li>
+                    <li>Responsive design for a smooth experience on both mobile and desktop</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="logout.js"></script>
+
+</body>
+
+</html>

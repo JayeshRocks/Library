@@ -1,0 +1,274 @@
+/* Global reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: #f4f4f4;
+    background-image: url('imgs/background.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+/* Navbar Styles */
+#navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: white;
+    margin: 0 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.navbar-links a:hover {
+    background-color: #555;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Account Dropdown */
+.account-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.account-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 150px;
+    max-width: 300px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    padding: 10px;
+    color: #333;
+    text-align: left;
+    white-space: nowrap;
+    width: auto;
+    transition: width 0.3s ease-in-out;
+}
+
+.account-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.account-dropdown:hover .account-icon {
+    background-color: #ddd;
+}
+
+#accountStatus {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#accountDetails {
+    font-size: 14px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+/* Admin Dashboard Styles */
+.admin-dashboard {
+    padding: 40px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 1000px;
+}
+
+/* Admin Dashboard Header */
+.admin-dashboard h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 20px;
+}
+
+/* Admin Book Management Section */
+.book-management {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Button Styles */
+.button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+/* Book List Styles */
+#bookList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    margin: 20px auto;
+    width: 100%;
+}
+
+/* Book Item Styles */
+.book-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    color: #333;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    min-height: 100px;
+    transition: transform 0.3s;
+}
+
+.book-item:hover {
+    transform: translateY(-5px);
+}
+
+.book-item h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: #000;
+    flex: 2;
+}
+
+.book-item p {
+    font-size: 14px;
+    margin: 0;
+    color: #020202;
+    flex: 1;
+}
+
+.reserve-btn {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+}
+
+.reserve-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Hidden Elements */
+.hidden {
+    display: none;
+}
+
+/* Table Styles for Admin View (Books) */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th, .table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    color: #fff;
+}
+
+.table th {
+    background-color: #333;
+}
+
+.table tr:nth-child(even) {
+    background-color: #444;
+}
+
+.table tr:hover {
+    background-color: #555;
+}
+
+/* Manage Book Form */
+.manage-book-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 10px;
+    width: 60%;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.manage-book-form input, .manage-book-form select, .manage-book-form textarea {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    width: 100%;
+}
+
+.manage-book-form button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.manage-book-form button:hover {
+    background-color: #218838;
+}

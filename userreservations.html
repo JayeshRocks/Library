@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Reservations - Library Management System</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" href="imgs/favicon-96x96.png" type="image/png">
+
+    <style>
+        /* Adjusted Styling for Reservations */
+        #reservationList {
+            padding: 20px;
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .book-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .book-item h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .book-item p {
+            margin: 8px 0;
+            font-size: 1em;
+            color: #555;
+        }
+
+        .extend-due-date {
+            font-size: 1em;
+            color: #007BFF;
+            text-decoration: underline;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .extend-due-date:hover {
+            color: #0056b3;
+        }
+
+        .extend-tooltip {
+            visibility: hidden;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 5px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .extend-due-date:hover .extend-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMoJGj_DJH_PETHpxbAIlZK4X7qV-S1v0",
+            authDomain: "lib-management-sys-17120.firebaseapp.com",
+            projectId: "lib-management-sys-17120",
+            storageBucket: "lib-management-sys-17120.appspot.com",
+            messagingSenderId: "800291285303",
+            appId: "1:800291285303:web:5423155460105d06a3d2b2",
+            measurementId: "G-RKL7RBDP5Q"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let user = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            onAuthStateChanged(auth, (currentUser) => {
+                user = currentUser;
+                updateUserStatus();
+
+                if (user) {
+                    fetchUserReservations();
+                } else {
+                    document.getElementById("reservationList").innerHTML =
+                        "<p>Please log in to view your reservations.</p>";
+                }
+            });
+        });
+
+        function updateUserStatus() {
+            const userStatus = document.getElementById("accountStatus");
+            const userDetails = document.getElementById("accountDetails");
+            const myReservations = document.getElementById("myReservations");
+            const adminDashboard = document.getElementById("adminDashboard");
+            const login = document.getElementById("login");
+            const signup = document.getElementById("signup");
+            const logout = document.getElementById("logout");
+
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                getDoc(userRef).then((docSnapshot) => {
+                    if (docSnapshot.exists()) {
+                        const userData = docSnapshot.data();
+                        const userName = userData.name || "User";
+                        const userEmail = userData.email;
+
+                        userStatus.textContent = `Logged in as ${userName}`;
+                        userDetails.textContent = `${userEmail}`;
+
+                        myReservations.classList.remove("hidden");
+                        if (userData.accessType === "Admin") {
+                            adminDashboard.classList.remove("hidden");
+                        } else {
+                            adminDashboard.classList.add("hidden");
+                        }
+
+                        login.classList.add("hidden");
+                        signup.classList.add("hidden");
+                        logout.classList.remove("hidden");
+                    }
+                });
+            } else {
+                userStatus.textContent = "Browsing as Guest";
+                userDetails.textContent = "";
+
+                myReservations.classList.add("hidden");
+                adminDashboard.classList.add("hidden");
+                login.classList.remove("hidden");
+                signup.classList.remove("hidden");
+                logout.classList.add("hidden");
+            }
+        }
+
+        async function fetchUserReservations() {
+            const reservationList = document.getElementById("reservationList");
+            reservationList.innerHTML = "Loading reservations...";
+
+            try {
+                const reservationsQuery = query(
+                    collection(db, "reservations"),
+                    where("reservedBy", "==", user.uid)
+                );
+
+                const reservationSnapshot = await getDocs(reservationsQuery);
+
+                if (reservationSnapshot.empty) {
+                    reservationList.innerHTML = "<p>No reservations found.</p>";
+                    return;
+                }
+
+                let reservationItems = "";
+                for (const docSnap of reservationSnapshot.docs) {
+                    const reservation = docSnap.data();
+
+                    const bookDoc = await getDoc(doc(db, "books", reservation.isbn));
+                    if (bookDoc.exists()) {
+                        const book = bookDoc.data();
+                        reservationItems += `
+                            <div class="book-item">
+                                <h3>${book.title}</h3>
+                                <p><strong>Author:</strong> ${book.author}</p>
+                                <p><strong>Genre:</strong> ${book.genre}</p>
+                                <p><strong>ISBN:</strong> ${book.isbn}</p>
+                                <p><strong>Reservation Date:</strong> ${reservation.reservationDate.toDate().toLocaleDateString()}</p>
+                                <p><strong>Due Date:</strong> ${reservation.dueDate.toDate().toLocaleDateString()}</p>
+                                <p><a href="#" class="extend-due-date">
+                                    Extend Due Date?
+                                    <span class="extend-tooltip">Please contact the Librarian to extend your due date.</span>
+                                </a></p>
+                            </div>`;
+                    }
+                }
+
+                reservationList.innerHTML = reservationItems;
+            } catch (error) {
+                console.error("Error fetching reservations:", error);
+                reservationList.innerHTML = "<p>Error loading reservations. Please try again later.</p>";
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="navbar">
+        <div class="navbar-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="userreservations.html" id="myReservations" class="hidden">My Reservations</a>
+            <a href="admin.html" id="adminDashboard" class="hidden">Admin Dashboard</a>
+            <a href="login.html" id="login">Log In</a>
+            <a href="signup.html" id="signup">Sign Up</a>
+            <a href="#" id="logout" class="hidden">Log Out</a>
+        </div>
+        <div class="account-dropdown">
+            <img src="imgs/accounts-icon.png" alt="Account" class="account-icon">
+            <div class="dropdown-content">
+                <p id="accountStatus">Browsing as Guest</p>
+                <p id="accountDetails"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="reservationList"></div>
+
+    <script type="module" src="logout.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" href="imgs/favicon-96x96.png" type="image/png">
+
+    <!-- Firebase Modular SDK Libraries -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, query, orderBy, limit, startAfter, where, doc, getDoc, setDoc, updateDoc, arrayUnion } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js';
+        window.firebaseFirestore = { getFirestore, setDoc, collection, getDocs, query, orderBy, limit, startAfter, where, doc, getDoc, updateDoc, arrayUnion }; // Include all necessary methods
+
+        // Firebase Initialization
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMoJGj_DJH_PETHpxbAIlZK4X7qV-S1v0",
+            authDomain: "lib-management-sys-17120.firebaseapp.com",
+            projectId: "lib-management-sys-17120",
+            storageBucket: "lib-management-sys-17120.appspot.com",
+            messagingSenderId: "800291285303",
+            appId: "1:800291285303:web:5423155460105d06a3d2b2",
+            measurementId: "G-RKL7RBDP5Q"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let user = null;
+        let books = [];
+        let lastVisibleBook = null;
+
+        // Wait for DOM content to load
+        document.addEventListener("DOMContentLoaded", function () {
+            // Listen for changes in the user's authentication state
+            onAuthStateChanged(auth, (currentUser) => {
+                user = currentUser;
+                updateUserStatus();
+            });
+
+            // Call functions after the DOM is loaded
+            fetchBooks();
+        });
+
+        function updateUserStatus() {
+            const userStatus = document.getElementById("accountStatus");
+            const userDetails = document.getElementById("accountDetails");
+
+            // Navbar links
+            const myReservations = document.getElementById("myReservations");
+            const adminDashboard = document.getElementById("adminDashboard");
+            const login = document.getElementById("login");
+            const signup = document.getElementById("signup");
+            const logout = document.getElementById("logout");
+
+            if (user) {
+                // Fetch user data
+                const userRef = doc(db, "users", user.uid); // Correct use of `doc`
+                getDoc(userRef)
+                    .then((docSnapshot) => {
+                        if (docSnapshot.exists()) {
+                            const userData = docSnapshot.data();
+                            const userName = userData.name || "User";
+                            const userEmail = userData.email;
+                            const accessType = userData.accessType;
+
+                            // Update account dropdown
+                            userStatus.textContent = `Logged in as ${userName}`;
+                            userDetails.textContent = `${userEmail}`;
+
+                            // Show/hide links based on user role
+                            if (accessType === "Admin") {
+                                adminDashboard.classList.remove("hidden");
+                            } else {
+                                adminDashboard.classList.add("hidden");
+                            }
+                            myReservations.classList.remove("hidden");
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching user data:", error);
+                        userStatus.textContent = "Error fetching user data.";
+                    });
+
+                // Show logout, hide login and signup
+                login.classList.add("hidden");
+                signup.classList.add("hidden");
+                logout.classList.remove("hidden");
+            } else {
+                // Guest user
+                userStatus.textContent = "Browsing as Guest";
+                userDetails.textContent = "";
+
+                // Hide admin/dashboard links
+                myReservations.classList.add("hidden");
+                adminDashboard.classList.add("hidden");
+
+                // Show login and signup, hide logout
+                login.classList.remove("hidden");
+                signup.classList.remove("hidden");
+                logout.classList.add("hidden");
+            }
+        }
+
+        // Fetch Books from Firestore (Pagination)
+        async function fetchBooks() {
+            // Show loading indicator
+            document.getElementById("loading-indicator").style.display = "block";
+            document.getElementById("bookList").classList.add("hidden");
+
+            try {
+                let booksQuery = query(collection(db, "books"), orderBy("title"), limit(5));
+
+                if (lastVisibleBook) {
+                    booksQuery = query(booksQuery, startAfter(lastVisibleBook));
+                }
+
+                const querySnapshot = await getDocs(booksQuery);
+                lastVisibleBook = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+                querySnapshot.forEach(doc => {
+                    books.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Sort books by availability: available first, then unavailable
+                books.sort((a, b) => b.isAvailable - a.isAvailable);
+
+                displayBooks(books);
+            } catch (error) {
+                console.error("Error fetching books:", error);
+                // Handle error case
+                document.getElementById("loading-indicator").textContent = "Failed to load books.";
+            }
+        }
+
+        // Book Display
+        function displayBooks(bookArray) {
+            const bookList = document.getElementById("bookList");
+            bookList.innerHTML = "";
+
+            bookArray.forEach(book => {
+                const isAvailableClass = book.isAvailable ? "" : "disabled";
+                const reserveText = book.isAvailable ? "Reserve" : "Unavailable";
+
+                const bookItem = `
+            <div class="book-item">
+                <h3>${book.title}</h3>
+                <p><strong>Author:</strong> ${book.author}</p>
+                <p><strong>Genre:</strong> ${book.genre}</p>
+                <p><strong>ISBN:</strong> ${book.isbn}</p>
+                <button class="reserve-btn ${isAvailableClass}" 
+                        onclick="reserveBook('${book.id}')" 
+                        ${book.isAvailable ? "" : "disabled"}>
+                    ${reserveText}
+                </button>
+            </div>`;
+                bookList.innerHTML += bookItem;
+            });
+
+            // Hide loading indicator and show book list
+            document.getElementById("loading-indicator").style.display = "none";
+            document.getElementById("bookList").classList.remove("hidden");
+        }
+
+        async function reserveBook(isbn) {
+            try {
+                const bookRef = doc(db, "books", isbn);
+                const bookDoc = await window.firebaseFirestore.getDoc(bookRef);
+
+                if (!bookDoc.exists() || !bookDoc.data().isAvailable) {
+                    alert("This book is unavailable.");
+                    return;
+                }
+
+                if (!user) {
+                    alert("Please log in to reserve books.");
+                    return;
+                }
+
+                // Reservation details
+                const reservationDate = new Date();
+                const dueDate = new Date();
+                dueDate.setDate(reservationDate.getDate() + 7);
+
+                // Update Firestore
+                const reservationRef = doc(db, "reservations", isbn);
+                await setDoc(reservationRef, {
+                    isbn: isbn,
+                    reservedBy: user.uid,
+                    reservationDate: reservationDate,
+                    dueDate: dueDate,
+                });
+
+                // Update book status
+                await updateDoc(bookRef, {
+                    isAvailable: false,
+                    reservedBy: user.uid,
+                });
+
+                // Update user's reservedBooks array
+                const userRef = doc(db, "users", user.uid);
+                await updateDoc(userRef, {
+                    reservedBooks: arrayUnion(isbn),
+                });
+
+                alert("Book reserved successfully!");
+            } catch (error) {
+                alert(`Failed to reserve book: ${error.message}`);
+            }
+        }
+
+        // Make the function accessible globally
+        window.reserveBook = reserveBook;
+
+    </script>
+</head>
+
+<body>
+    <div id="navbar">
+        <div class="navbar-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="userReservations.html" id="myReservations" class="hidden">My Reservations</a>
+            <a href="admin.html" id="adminDashboard" class="hidden">Admin Dashboard</a>
+            <a href="login.html" id="login">Log In</a>
+            <a href="signup.html" id="signup">Sign Up</a>
+            <a href="#" id="logout" class="hidden">Log Out</a>
+        </div>
+        <div class="account-dropdown">
+            <img src="imgs/accounts-icon.png" alt="Account" class="account-icon">
+            <div class="dropdown-content">
+                <p id="accountStatus">Browsing as Guest</p>
+                <p id="accountDetails"></p>
+            </div>
+        </div>
+    </div>
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search books...">
+        <select id="categorySelect">
+            <option value="all">All Categories</option>
+            <option value="fiction">Fiction</option>
+            <option value="non-fiction">Non-fiction</option>
+            <option value="science">Science</option>
+            <option value="literature">Literature</option>
+        </select>
+        <button onclick="searchAndFilter()">Search</button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="loading-indicator">
+        Loading books...
+    </div>
+
+    <!-- Book List -->
+    <div id="bookList"></div>
+
+    <script type="module" src="logout.js"></script>
+
+</body>
+
+</html>

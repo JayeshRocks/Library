@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup - Library Management</title>
+    <link rel="stylesheet" href="signup.css"> <!-- Include your Signup-specific CSS -->
+    <link rel="icon" href="imgs/favicon-96x96.png" type="image/png">
+
+    <!-- Firebase Compatibility Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMoJGj_DJH_PETHpxbAIlZK4X7qV-S1v0",
+            authDomain: "lib-management-sys-17120.firebaseapp.com",
+            projectId: "lib-management-sys-17120",
+            storageBucket: "lib-management-sys-17120.appspot.com",
+            messagingSenderId: "800291285303",
+            appId: "1:800291285303:web:5423155460105d06a3d2b2",
+            measurementId: "G-RKL7RBDP5Q"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Firebase services
+        const auth = firebase.auth();
+        const db = firebase.firestore(); // Import Firestore correctly
+    </script>
+
+    <script>
+        /**
+         * Signup Function
+         * Registers a new user using Firebase Authentication, sends an email verification, and stores details in Firestore.
+         */
+         async function signup() {
+    const email = document.getElementById("emailInput").value.trim();
+    const password = document.getElementById("passwordInput").value.trim();
+    const retypePassword = document.getElementById("retypePasswordInput").value.trim();
+    const name = document.getElementById("fullNameInput").value.trim();
+
+    if (!email || !password || !name) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    if (password !== retypePassword) {
+        alert("Passwords do not match. Please try again.");
+        return;
+    }
+
+    try {
+        // Create the user in Firebase Authentication
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user; // Retrieve the created user's UID
+
+        // Save user details in Firestore with UID as document ID
+        await firebase.firestore().collection("users").doc(user.uid).set({
+            name: name,
+            email: email,
+            accessType: "User",
+            reservedBooks: [] // Initialize reservedBooks as an empty array
+        });
+
+        // Send email verification
+        alert("Signup successful! Please verify your email.");
+        await user.sendEmailVerification();
+
+        // Redirect to login page
+        window.location.href = "login.html";
+    } catch (error) {
+        alert(`Signup failed: ${error.message}`);
+    }
+}
+
+    </script>
+</head>
+
+<body>
+    <section>
+        <form onsubmit="event.preventDefault(); signup();">
+            <h1>Signup</h1>
+            <div class="inputbox">
+                <ion-icon name="person-outline"></ion-icon>
+                <input type="text" id="fullNameInput" required>
+                <label>Full Name</label>
+            </div>
+            <div class="inputbox">
+                <ion-icon name="mail-outline"></ion-icon>
+                <input type="email" id="emailInput" required>
+                <label>Email</label>
+            </div>
+            <div class="inputbox">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" id="passwordInput" required>
+                <label>Password</label>
+            </div>
+            <div class="inputbox">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" id="retypePasswordInput" required>
+                <label>Retype Password</label>
+            </div>
+            <button type="submit">Sign Up</button>
+            <div class="register">
+                <p>Already have an account? <a href="login.html">Login</a></p>
+            </div>
+        </form>
+    </section>
+</body>
+
+</html>

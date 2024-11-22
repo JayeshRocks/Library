@@ -1,0 +1,258 @@
+/* Global reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: #f4f4f4;
+    background-image: url('imgs/background.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+/* Navbar Styles */
+#navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: white;
+    margin: 0 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.navbar-links a:hover {
+    background-color: #555;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Account Dropdown */
+.account-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.account-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 150px;
+    max-width: 300px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    padding: 10px;
+    color: #333;
+    text-align: left;
+    white-space: nowrap;
+    width: auto;
+    transition: width 0.3s ease-in-out;
+}
+
+.account-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.account-dropdown:hover .account-icon {
+    background-color: #ddd;
+}
+
+#accountStatus {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#accountDetails {
+    font-size: 14px;
+    color: #555;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+/* About Section */
+.about-section {
+    padding: 40px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 800px;
+}
+
+.about-section h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.about-section p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.about-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.about-section ul li {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    display: none;
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-bar input {
+    flex: 3;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 20px;
+    max-width: 100%;
+}
+
+.search-bar select {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 20px;
+    max-width: 200px;
+}
+
+.search-bar button {
+    padding: 5px 15px;
+    font-size: 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+}
+
+.search-bar button:hover {
+    background-color: #45a049;
+}
+
+/* Book List Styles */
+#bookList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    margin: 20px auto;
+    width: 100%;
+}
+
+/* Book Item Styles */
+.book-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    color: #333;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    min-height: 100px;
+    transition: transform 0.3s;
+}
+
+.book-item:hover {
+    transform: translateY(-5px);
+}
+
+.book-item h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: #000;
+    flex: 2;
+}
+
+.book-item p {
+    font-size: 14px;
+    margin: 0;
+    color: #020202;
+    flex: 1;
+}
+
+.reserve-btn {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.3s;
+}
+
+.reserve-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Hidden Elements */
+.hidden {
+    display: none;
+}

@@ -1,0 +1,353 @@
+/* Global reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: #f4f4f4;
+    background-image: url('imgs/background.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+}
+
+/* Tooltip Styles */
+.extend-due-date {
+    position: relative;
+    color: #0073e6;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.extend-due-date:hover .tooltip {
+    display: block;
+}
+
+.tooltip {
+    display: none;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    background-color: #333;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 0.85em;
+    width: 200px;
+    z-index: 10;
+}
+
+/* Reservation List Container */
+#reservationList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1200px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Reservation Cards */
+.card {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+    color: #000;
+}
+
+.card-body p {
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+#reservationList {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.book-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.book-item h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.4em;
+}
+
+.book-item p {
+    margin: 15px 0;
+    /* Increased margin for more space between the paragraphs */
+    font-size: 1em;
+    color: #555;
+}
+
+.book-item p strong {
+    color: #333;
+}
+
+.extend-due-date {
+    font-size: 1em;
+    color: #007BFF;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.extend-due-date:hover {
+    color: #0056b3;
+}
+
+.extend-tooltip {
+    width: 350px;
+    visibility: hidden;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.extend-due-date:hover .extend-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #reservationList {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .card-header h3 {
+        font-size: 16px;
+    }
+
+    .card-body p {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        padding: 10px;
+    }
+
+    .card-header h3 {
+        font-size: 14px;
+    }
+
+    .card-body p {
+        font-size: 10px;
+    }
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    display: none; /* Hidden by default */
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Navbar Styles */
+#navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: white;
+    margin: 0 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.navbar-links a:hover {
+    background-color: #555;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Account Dropdown */
+.account-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.account-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 150px; /* Ensure a minimum width */
+    max-width: 300px; /* Optional: Set a max width if desired */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    padding: 10px;
+    color: #333;
+    text-align: left;
+    white-space: nowrap; /* Prevents wrapping of the text */
+    width: auto; /* Allow the width to grow based on content */
+    transition: width 0.3s ease-in-out; /* Smooth transition */
+}
+
+.account-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Optional: Hover effect */
+.account-dropdown:hover .account-icon {
+    background-color: #ddd;
+}
+
+#accountStatus {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#accountDetails {
+    font-size: 14px;
+    color: #555;
+    white-space: nowrap; /* Prevent wrapping */
+    overflow: hidden; /* Hide overflow */
+    text-overflow: ellipsis; /* Show ellipsis if text overflows */
+    text-align: center; /* Center the email */
+}
+
+/* Adjust the account status and email to be in one line if the text is too long */
+.account-dropdown .dropdown-content p {
+    margin: 0; /* Remove margins to prevent any space between elements */
+    padding: 0; /* Remove padding */
+    text-align: center; /* Center the text in the dropdown */
+}
+
+/* Loading Indicator */
+.loading-indicator {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    display: none;
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px;
+    gap: 10px; /* Add consistent spacing between items */
+    width: 100%;
+    box-sizing: border-box; /* Ensure it doesn't exceed viewport width */
+}
+
+.search-bar input {
+    flex: 3; /* Take the most space */
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 20px;
+    max-width: 100%; /* Prevent input from overflowing */
+}
+
+.search-bar select {
+    flex: 1; /* Smaller width for dropdown */
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 20px;
+    max-width: 200px; /* Optional: Limit max width for dropdown */
+}
+
+.search-bar button {
+    padding: 5px 15px; /* Adjust padding */
+    font-size: 16px; /* Keep text size consistent */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 20px; /* Make corners round */
+    cursor: pointer;
+    white-space: nowrap; /* Ensure text doesn't wrap */
+    min-width: 120px; /* Prevent shrinking */
+}
+
+.search-bar button:hover {
+    background-color: #45a049;
+}

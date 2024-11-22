@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Library Management</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="icon" href="imgs/favicon-96x96.png" type="image/png">
+
+    <!-- Firebase Compatibility Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMoJGj_DJH_PETHpxbAIlZK4X7qV-S1v0",
+            authDomain: "lib-management-sys-17120.firebaseapp.com",
+            projectId: "lib-management-sys-17120",
+            storageBucket: "lib-management-sys-17120.appspot.com",
+            messagingSenderId: "800291285303",
+            appId: "1:800291285303:web:5423155460105d06a3d2b2",
+            measurementId: "G-RKL7RBDP5Q"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Firebase services
+        const auth = firebase.auth();
+    </script>
+
+    <script>
+        /**
+         * Login Function
+         * Authenticates the user and resends a verification email if the user is not verified.
+         */
+        async function login() {
+            const email = document.getElementById("emailInput").value.trim();
+            const password = document.getElementById("passwordInput").value.trim();
+
+            if (!email || !password) {
+                alert("Please fill in both fields.");
+                return;
+            }
+
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                if (!user.emailVerified) {
+                    alert(
+                        `Your email is not verified. A new verification email has been sent to ${email}. Please verify your email before logging in.`
+                    );
+                    await user.sendEmailVerification();
+                    await auth.signOut();
+                    return;
+                }
+
+                alert("Login successful!");
+                window.location.href = "index.html";
+            } catch (error) {
+                alert(`Login failed: ${error.message}`);
+            }
+        }
+
+        /**
+         * Show Forgot Password View
+         */
+        function showForgotPassword() {
+            document.querySelector(".login-form").style.display = "none";
+            document.querySelector(".forgot-password-form").style.display = "block";
+        }
+
+        /**
+         * Go Back to Login View
+         */
+        function goBackToLogin() {
+            document.querySelector(".login-form").style.display = "block";
+            document.querySelector(".forgot-password-form").style.display = "none";
+        }
+
+        /**
+         * Forgot Password Function
+         * Sends a password reset email to the user.
+         */
+        async function forgotPassword() {
+            const email = document.getElementById("resetEmailInput").value.trim();
+
+            if (!email) {
+                alert("Please enter your email address.");
+                return;
+            }
+
+            try {
+                await auth.sendPasswordResetEmail(email);
+                alert(`Password reset email sent to ${email}.`);
+                goBackToLogin();
+            } catch (error) {
+                alert(`Failed to send reset link: ${error.message}`);
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <section>
+        <!-- Login Form -->
+        <form class="login-form" onsubmit="event.preventDefault(); login();">
+            <h1>Login</h1>
+            <div class="inputbox">
+                <ion-icon name="mail-outline"></ion-icon>
+                <input type="email" id="emailInput" required>
+                <label for="">Email</label>
+            </div>
+            <div class="inputbox">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" id="passwordInput" required>
+                <label for="">Password</label>
+            </div>
+            <button type="submit">Login</button>
+            <div class="register">
+                <p><a href="#" onclick="showForgotPassword()">Forgot Password?</a></p>
+                <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+            </div>
+        </form>
+
+        <!-- Forgot Password Form -->
+        <form class="forgot-password-form" style="display: none;" onsubmit="event.preventDefault(); forgotPassword();">
+            <h1>Reset Password</h1>
+            <div class="inputbox">
+                <ion-icon name="mail-outline"></ion-icon>
+                <input type="email" id="resetEmailInput" required>
+                <label for="">Email</label>
+            </div>
+            <button type="submit">Send Reset Password Link</button>
+            <div class="register">
+                <p><a href="#" onclick="goBackToLogin()">Go Back</a></p>
+            </div>
+        </form>
+    </section>
+</body>
+
+</html>
